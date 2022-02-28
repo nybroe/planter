@@ -59,8 +59,8 @@ while True:
     hoursUntilPlanting = daysUntilPlanting * 24 
     secondsUntilPlanting = hoursUntilPlanting * 60 * 60
 
-    mins, secs = divmod(int(secondsUntilPlanting), 60)
-    timer = '{:02d}:{:02d}'.format(mins, secs)
+    hours, mins, secs = divmod(int(secondsUntilPlanting), 60)
+    timer = '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
 
     dateTimeObj = datetime.now()
     timestampStr = dateTimeObj.strftime("[%d-%b-%Y (%H:%M:%S)]")
