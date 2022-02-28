@@ -74,7 +74,7 @@ while True:
     print(f"{timestampStr} Plants needed before planting: {plantsNeededForPlanting:.2f}")
     print(f"{timestampStr} Seconds until next planting: {secondsUntilNextPlanting:.2f}")
     print(f"{timestampStr} Until next planting: {secondsUntilNextPlanting:.2f}")
-    print(timer, end="\r")
+    print(timer)
     print("************************")
     
     if availablePlants >= min_plant_amount and availablePlants < (min_plant_amount + margin_of_error):
