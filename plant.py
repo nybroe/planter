@@ -8,6 +8,7 @@ garden_contract_addr = "0x685BFDd3C2937744c13d7De0821c83191E3027FF"
 wallet_public_addr = "0x361472B5784e83fBF779b015f75ea0722741f304"
 min_plant_amount = 10.00
 loop_sleep_seconds = 5 # 60*60 # One hour
+margin_of_error = 0.01
 
 # load private key
 wallet_private_key = open('key.txt', "r").readline()
@@ -52,16 +53,11 @@ while True:
     dateTimeObj = datetime.now()
     timestampStr = dateTimeObj.strftime("[%d-%b-%Y (%H:%M:%S)]")
     
-    if available_plants > min_plant_amount and available >= seedsFor1Plant:
+    if available_plants >= min_plant_amount and available_plants < (min_plant_amount + margin_of_error):
         # plant()
-       
         print(f"{timestampStr} Planted! {available_plants:.2f} added to garden.")
-        #print(f"{timestampStr} Total value of your deposit is now ${total_value:,.2f}")
     else:
-        if available_plants < min_plant_amount:
-            print(f"{timestampStr} Only {available:.2f} seeds is available for the minimum required amount: {(min_plant_amount * seedsFor1Plant):.2f}. Sleeps..")
-        else:
-            print(f"{timestampStr} Planting not ready {available:.2f} seeds available. Need {((min_plant_amount * seedsFor1Plant) - available):.2f} more")
+        print(f"{timestampStr} Only {available:.2f} seeds is available for the minimum required amount: {(min_plant_amount * seedsFor1Plant):.2f}. Sleeps..")
 
     countdown(loop_sleep_seconds)
     
