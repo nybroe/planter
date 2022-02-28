@@ -7,7 +7,7 @@ import time
 garden_contract_addr = "0x685BFDd3C2937744c13d7De0821c83191E3027FF"
 wallet_public_addr = "0x361472B5784e83fBF779b015f75ea0722741f304"
 min_plant_amount = 3.00
-loop_sleep_seconds = 5 # 60*60 # One hour
+loop_sleep_seconds = 60
 margin_of_error = 0.01
 seeds_per_day_per_plant = 86400
 
@@ -67,22 +67,25 @@ while True:
     timestampStr = dateTimeObj.strftime("[%d-%b-%Y (%H:%M:%S)]")
     
     print("********** STATS *******")
-    print(f"{timestampStr} Seeds for 1 plant: {seedsFor1Plant:.2f}")
-    print(f"{timestampStr} Seeds per day: {seedsPerDay:.2f}")
-    print(f"{timestampStr} Planted plants: {plantedPlants:.2f}")
-    print(f"{timestampStr} Available seeds: {available:.2f}")
-    print(f"{timestampStr} Available plants: {availablePlants:.2f}")
-    print(f"{timestampStr} Margin of error: {margin_of_error:.2f}")
-    print(f"{timestampStr} Plants needed before planting: {plantsNeededForPlanting:.2f}")
-    print(f"{timestampStr} Seeds needed before planting: {seedsNeededForPlanting:.2f}")
-    print(f"{timestampStr} Seconds until next planting: {secondsUntilPlanting:.2f}")
+    print(f"{timestampStr} Seeds for 1 plant: {seedsFor1Plant:.3f}")
+    print(f"{timestampStr} Seeds per day: {seedsPerDay:.3f}")
+    print(f"{timestampStr} Planted plants: {plantedPlants:.3f}")
+    print(f"{timestampStr} Available seeds: {available:.3f}")
+    print(f"{timestampStr} Available plants: {availablePlants:.3f}")
+    print(f"{timestampStr} Margin of error: {margin_of_error:.3f}")
+    print(f"{timestampStr} Plants needed before planting: {plantsNeededForPlanting:.3f}")
+    print(f"{timestampStr} Seeds needed before planting: {seedsNeededForPlanting:.3f}")
+    print(f"{timestampStr} Seconds until next planting: {secondsUntilPlanting:.3f}")
     print(f"{timestampStr} Until next planting:")
     print(timer)
     print("************************")
     
+          #  3.00      >=       3.00                  3.00       <         3.01
     if availablePlants >= min_plant_amount and availablePlants < (min_plant_amount + margin_of_error):
-        # plant()
-        print(f"{timestampStr} Planted! {availablePlants:.2f} added to garden.")
+        plant()
+        print("********** PLANTED *******")
+        print(f"Added {availablePlants:.2f} plants to the garden!")
+        print("**************************")
 
     countdown(loop_sleep_seconds)
     
