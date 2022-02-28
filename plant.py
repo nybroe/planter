@@ -13,7 +13,7 @@ loop_sleep_seconds = 5 # 60*60 # One hour
 wallet_private_key = open('key.txt', "r").readline()
 
 # load abi
-f = open('garden.json')
+f = open('garden_abi.json')
 garden_abi = json.load(f)
 
 # create contract
