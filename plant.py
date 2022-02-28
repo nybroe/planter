@@ -58,7 +58,7 @@ while True:
     seedsPerSecond = seeds_per_second_per_plant * plantedPlants
     secondsUntilNextPlanting = seedsNeededForPlanting / seedsPerSecond
 
-    mins, secs = divmod(secondsUntilNextPlanting, 60)
+    mins, secs = divmod(int(secondsUntilNextPlanting), 60)
     timer = '{:02d}:{:02d}'.format(mins, secs)
 
     dateTimeObj = datetime.now()
