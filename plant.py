@@ -1,34 +1,33 @@
 import json
 import time
 import contract as c
-from price import get_drip_price
 from datetime import datetime
 import time
 
-drip_contract_addr = "0xFFE811714ab35360b67eE195acE7C10D93f89D8C"
+garden_contract_addr = "0x685BFDd3C2937744c13d7De0821c83191E3027FF"
 wallet_public_addr = "0x361472B5784e83fBF779b015f75ea0722741f304"
-min_hydrate_amount = 0.050
-loop_sleep_seconds = 60*60 # One hour
+min_plant_amount = 10
+loop_sleep_seconds = 5 # 60*60 # One hour
 
 # load private key
 wallet_private_key = open('key.txt', "r").readline()
 
 # load abi
-f = open('faucet_abi.json')
-faucet_abi = json.load(f)
+f = open('garden.json')
+garden_abi = json.load(f)
 
 # create contract
-faucet_contract = c.connect_to_contract(drip_contract_addr, faucet_abi)
+garden_contract = c.connect_to_contract(garden_contract_addr, garden_abi)
 
-def deposit_amount(addr):
-    user_totals = faucet_contract.functions.userInfoTotals(addr).call()
-    return user_totals[1]/1000000000000000000
+def seeds_for_1_plant():
+    seedsFor1Plant = garden_contract.functions.SEEDS_TO_GROW_1PLANT().call()
+    return seedsFor1Plant
 
-def available(addr):
-    return faucet_contract.functions.claimsAvailable(addr).call() / 1000000000000000000
+def available_seeds():
+    return garden_contract.functions.getMySeeds(wallet_public_addr).call()
 
-def hydrate():
-    txn = faucet_contract.functions.roll().buildTransaction(c.get_tx_options(wallet_public_addr, 500000))
+def plant():
+    txn = garden_contract.functions.roll().buildTransaction(c.get_tx_options(wallet_public_addr, 500000))
     return c.send_txn(txn, wallet_private_key)
 
 def countdown(t):
@@ -42,25 +41,23 @@ def countdown(t):
     
 # create infinate loop that checks contract every set sleep time
 while True:
-    deposit = deposit_amount(wallet_public_addr)
-    hydrate_amount = deposit * .01
-    avail = available(wallet_public_addr)
+    seedsFor1Plant = seeds_for_1_plant()
+    available = available_seeds()
+    available_plants = available / seedsFor1Plant
+
     dateTimeObj = datetime.now()
     timestampStr = dateTimeObj.strftime("[%d-%b-%Y (%H:%M:%S)]")
     
-    if avail > min_hydrate_amount and avail >= hydrate_amount:
-        hydrate()
-        new_deposit = deposit_amount(wallet_public_addr)
-        drip_price = get_drip_price()
-        total_value = new_deposit * drip_price
-        
-        print(f"{timestampStr} Hydrated! {avail:.3f} added to deposit. Total deposit now {new_deposit:,.2f}")
-        print(f"{timestampStr} Total value of your deposit is now ${total_value:,.2f}")
+    if available_plants > min_plant_amount and available >= seedsFor1Plant:
+        # plant()
+       
+        print(f"{timestampStr} Planted! {available_plants:.3f} added to garden.")
+        #print(f"{timestampStr} Total value of your deposit is now ${total_value:,.2f}")
     else:
-        if avail < min_hydrate_amount:
-            print(f"{timestampStr} Only {avail:.3f} Drip is available for the minimum required amount: {min_hydrate_amount:.3f}. Sleeps..")
+        if available_plants < min_plant_amount:
+            print(f"{timestampStr} Only {available:.3f} seeds is available for the minimum required amount: {(min_plant_amount * seedsFor1Plant):.3f}. Sleeps..")
         else:
-            print(f"{timestampStr} Hydrate not ready {avail:.3f} Drip available. Need {(hydrate_amount - avail):.3f} more")
+            print(f"{timestampStr} Planting not ready {available:.3f} seeds available. Need {((min_plant_amount * seedsFor1Plant) - available):.3f} more")
 
     countdown(loop_sleep_seconds)
     
