@@ -9,11 +9,11 @@ wallet_public_addr = "0x361472B5784e83fBF779b015f75ea0722741f304"
 min_plant_amount = 3.00
 loop_sleep_seconds = 5 # 60*60 # One hour
 margin_of_error = 0.01
-seeds_per_day_per_plant = 86600
+seeds_per_day_per_plant = 86400
 seeds_per_hour_per_plant = seeds_per_day_per_plant / 24
 seeds_per_second_per_plant = seeds_per_hour_per_plant / 60 / 60
 
-seeds_per_plant = 2600000
+seeds_per_plant = 2592000
 
 # load private key
 wallet_private_key = open('key.txt', "r").readline()
