@@ -13,8 +13,6 @@ seeds_per_day_per_plant = 86400
 seeds_per_hour_per_plant = seeds_per_day_per_plant / 24
 seeds_per_second_per_plant = seeds_per_hour_per_plant / 60 / 60
 
-seeds_per_plant = 2592000
-
 # load private key
 wallet_private_key = open('key.txt', "r").readline()
 
@@ -56,9 +54,12 @@ while True:
     availablePlants = available / seedsFor1Plant
 
     plantsNeededForPlanting = (min_plant_amount + margin_of_error) - availablePlants
-    seedsNeededForPlanting = plantsNeededForPlanting * seeds_per_plant
+    seedsNeededForPlanting = plantsNeededForPlanting * seedsFor1Plant
     seedsPerSecond = seeds_per_second_per_plant * plantedPlants
     secondsUntilNextPlanting = seedsNeededForPlanting / seedsPerSecond
+
+    mins, secs = divmod(secondsUntilNextPlanting, 60)
+    timer = '{:02d}:{:02d}'.format(mins, secs)
 
     dateTimeObj = datetime.now()
     timestampStr = dateTimeObj.strftime("[%d-%b-%Y (%H:%M:%S)]")
@@ -72,6 +73,8 @@ while True:
     print(f"{timestampStr} Margin of error: {margin_of_error:.2f}")
     print(f"{timestampStr} Plants needed before planting: {plantsNeededForPlanting:.2f}")
     print(f"{timestampStr} Seconds until next planting: {secondsUntilNextPlanting:.2f}")
+    print(f"{timestampStr} Until next planting: {secondsUntilNextPlanting:.2f}")
+    print(timer, end="\r")
     print("************************")
     
     if availablePlants >= min_plant_amount and availablePlants < (min_plant_amount + margin_of_error):
