@@ -46,12 +46,16 @@ while True:
     available = available_seeds()
     available_plants = available / seedsFor1Plant
 
-    print(f"{seedsFor1Plant:.2f} seeds for 1 plant!")
-    print(f"{available:.2f} available seeds!")
-    print(f"{available_plants:.2f} available plants!")
 
     dateTimeObj = datetime.now()
     timestampStr = dateTimeObj.strftime("[%d-%b-%Y (%H:%M:%S)]")
+    
+    print("********** STATS *******")
+    print(f"{timestampStr} Seeds for 1 plant: {seedsFor1Plant:.2f}")
+    print(f"{timestampStr} Available seeds: {available:.2f}")
+    print(f"{timestampStr} Available plants: {available_plants:.2f}")
+    print(f"{timestampStr} Plants needed before planting: {(min_plant_amount + margin_of_error) - available_plants:.2f}")
+    print("************************")
     
     if available_plants >= min_plant_amount and available_plants < (min_plant_amount + margin_of_error):
         # plant()
