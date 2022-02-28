@@ -10,8 +10,6 @@ min_plant_amount = 3.00
 loop_sleep_seconds = 5 # 60*60 # One hour
 margin_of_error = 0.01
 seeds_per_day_per_plant = 86400
-seeds_per_hour_per_plant = seeds_per_day_per_plant / 24
-seeds_per_second_per_plant = seeds_per_hour_per_plant / 60 / 60
 
 # load private key
 wallet_private_key = open('key.txt', "r").readline()
@@ -55,10 +53,13 @@ while True:
 
     plantsNeededForPlanting = (min_plant_amount + margin_of_error) - availablePlants
     seedsNeededForPlanting = plantsNeededForPlanting * seedsFor1Plant
-    seedsPerSecond = seeds_per_second_per_plant * plantedPlants
-    secondsUntilNextPlanting = seedsNeededForPlanting / seedsPerSecond
+    
+    seedsPerDay = plantedPlants * seeds_per_day_per_plant
+    daysUntilPlanting = seedsNeededForPlanting / seedsPerDay
+    hoursUntilPlanting = daysUntilPlanting / 24
+    secondsUntilPlanting = hoursUntilPlanting / 60 / 60
 
-    mins, secs = divmod(int(secondsUntilNextPlanting), 60)
+    mins, secs = divmod(int(secondsUntilPlanting), 60)
     timer = '{:02d}:{:02d}'.format(mins, secs)
 
     dateTimeObj = datetime.now()
@@ -66,14 +67,14 @@ while True:
     
     print("********** STATS *******")
     print(f"{timestampStr} Seeds for 1 plant: {seedsFor1Plant:.2f}")
-    print(f"{timestampStr} Seeds per second: {seedsPerSecond:.2f}")
+    print(f"{timestampStr} Seeds per day: {seedsPerDay:.2f}")
     print(f"{timestampStr} Planted plants: {plantedPlants:.2f}")
     print(f"{timestampStr} Available seeds: {available:.2f}")
     print(f"{timestampStr} Available plants: {availablePlants:.2f}")
     print(f"{timestampStr} Margin of error: {margin_of_error:.2f}")
     print(f"{timestampStr} Plants needed before planting: {plantsNeededForPlanting:.2f}")
-    print(f"{timestampStr} Seconds until next planting: {secondsUntilNextPlanting:.2f}")
-    print(f"{timestampStr} Until next planting: {secondsUntilNextPlanting:.2f}")
+    print(f"{timestampStr} Seconds until next planting: {secondsUntilPlanting:.2f}")
+    print(f"{timestampStr} Until next planting:")
     print(timer)
     print("************************")
     
