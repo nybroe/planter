@@ -6,7 +6,7 @@ import time
 
 garden_contract_addr = "0x685BFDd3C2937744c13d7De0821c83191E3027FF"
 wallet_public_addr = "0x361472B5784e83fBF779b015f75ea0722741f304"
-min_plant_amount = 10.00
+min_plant_amount = 3.00
 loop_sleep_seconds = 5 # 60*60 # One hour
 margin_of_error = 0.01
 
@@ -54,14 +54,13 @@ while True:
     print(f"{timestampStr} Seeds for 1 plant: {seedsFor1Plant:.2f}")
     print(f"{timestampStr} Available seeds: {available:.2f}")
     print(f"{timestampStr} Available plants: {available_plants:.2f}")
+    print(f"{timestampStr} Margin of error: {margin_of_error:.2f}")
     print(f"{timestampStr} Plants needed before planting: {(min_plant_amount + margin_of_error) - available_plants:.2f}")
     print("************************")
     
     if available_plants >= min_plant_amount and available_plants < (min_plant_amount + margin_of_error):
         # plant()
         print(f"{timestampStr} Planted! {available_plants:.2f} added to garden.")
-    else:
-        print(f"{timestampStr} Only {available:.2f} seeds is available for the minimum required amount: {(min_plant_amount * seedsFor1Plant):.2f}. Sleeps..")
 
     countdown(loop_sleep_seconds)
     
