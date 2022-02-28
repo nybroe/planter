@@ -24,7 +24,7 @@ def seeds_for_1_plant():
     return seedsFor1Plant
 
 def available_seeds():
-    return garden_contract.functions.getMySeeds(wallet_public_addr).call()
+    return garden_contract.functions.getUserSeeds(wallet_public_addr).call()
 
 def plant():
     txn = garden_contract.functions.roll().buildTransaction(c.get_tx_options(wallet_public_addr, 500000))
