@@ -59,7 +59,8 @@ while True:
     hoursUntilPlanting = daysUntilPlanting * 24 
     secondsUntilPlanting = hoursUntilPlanting * 60 * 60
 
-    hours, mins, secs = divmod(int(secondsUntilPlanting), 60)
+    mins, secs = divmod(int(secondsUntilPlanting), 60)
+    hours, mins = divmod(int(mins), 60)
     timer = '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
 
     dateTimeObj = datetime.now()
