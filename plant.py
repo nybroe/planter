@@ -56,8 +56,8 @@ while True:
     
     seedsPerDay = plantedPlants * seeds_per_day_per_plant
     daysUntilPlanting = seedsNeededForPlanting / seedsPerDay
-    hoursUntilPlanting = daysUntilPlanting / 24
-    secondsUntilPlanting = hoursUntilPlanting / 60 / 60
+    hoursUntilPlanting = daysUntilPlanting * 24 
+    secondsUntilPlanting = hoursUntilPlanting * 60 * 60
 
     mins, secs = divmod(int(secondsUntilPlanting), 60)
     timer = '{:02d}:{:02d}'.format(mins, secs)
@@ -73,6 +73,7 @@ while True:
     print(f"{timestampStr} Available plants: {availablePlants:.2f}")
     print(f"{timestampStr} Margin of error: {margin_of_error:.2f}")
     print(f"{timestampStr} Plants needed before planting: {plantsNeededForPlanting:.2f}")
+    print(f"{timestampStr} Seeds needed before planting: {seedsNeededForPlanting:.2f}")
     print(f"{timestampStr} Seconds until next planting: {secondsUntilPlanting:.2f}")
     print(f"{timestampStr} Until next planting:")
     print(timer)
