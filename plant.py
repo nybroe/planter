@@ -1,16 +1,16 @@
 import json
 import time
 import contract as c
-from datetime import datetime
+from datetime import datetime,timedelta
 import time
 
 garden_contract_addr = "0x685BFDd3C2937744c13d7De0821c83191E3027FF"
 wallet_public_addr = "0x361472B5784e83fBF779b015f75ea0722741f304"
 min_plant_amount = 1.00
-loop_sleep_seconds = 60
-margin_of_error = 0.001
+loop_sleep_seconds = 5
+margin_of_error = 0.005
 seeds_per_day_per_plant = 86400
-start_polling_threshold_in_seconds = 60*10
+start_polling_threshold_in_seconds = 60*2
 
 # load private key
 wallet_private_key = open('key.txt', "r").readline()
@@ -41,6 +41,13 @@ def buildTimer(t):
     hours, mins = divmod(int(mins), 60)
     timer = '{:02d} hours, {:02d} minutes, {:02d} seconds'.format(hours, mins, secs)
     return timer
+
+def getNextPlantingDate(t):
+    mins, secs = divmod(int(t), 60)
+    hours, mins = divmod(int(mins), 60)
+    nextPlantAt = datetime.today() + timedelta(hours=hours,minutes=mins,seconds=secs)
+    timestampStr = nextPlantAt.strftime("[%d-%b-%Y (%H:%M:%S)]")
+    return timestampStr
 
 def countdown(t):
     while t:
@@ -76,6 +83,7 @@ while True:
     print(f"{timestampStr} Minimum plants to plant: {min_plant_amount:.3f}")
     print(f"{timestampStr} Plants needed before planting: {plantsNeededForPlanting:.3f}")
     print(f"{timestampStr} Until next planting: {buildTimer(secondsUntilPlanting)}")
+    print(f"{timestampStr} Next planting at: {getNextPlantingDate(secondsUntilPlanting)}")
     print(f"{timestampStr} Start polling each {(loop_sleep_seconds / 60)} minute {(start_polling_threshold_in_seconds / 60):.0f} minutes before next planting")
     print("************************")
 
