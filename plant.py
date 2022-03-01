@@ -39,12 +39,12 @@ def plant():
 def buildTimer(t):
     mins, secs = divmod(int(t), 60)
     hours, mins = divmod(int(mins), 60)
-    timer = '{:02d}:{:02d}:{:02d}'.format(hours, mins, secs)
+    timer = '{:02d} hours, {:02d} minutes, {:02d} seconds'.format(hours, mins, secs)
     return timer
 
 def countdown(t):
     while t:
-        print(buildTimer(t), end="\r")
+        print(f"Next poll in: {buildTimer(t)}", end="\r")
         time.sleep(1)
         t -= 1
 
@@ -77,8 +77,8 @@ while True:
     print(f"{timestampStr} Margin of error: {margin_of_error:.3f}")
     print(f"{timestampStr} Plants needed before planting: {plantsNeededForPlanting:.3f}")
     print(f"{timestampStr} Seeds needed before planting: {seedsNeededForPlanting:.3f}")
-    print(f"{timestampStr} Seconds until next planting: {secondsUntilPlanting:.3f}")
     print(f"{timestampStr} Until next planting: {buildTimer(secondsUntilPlanting)}")
+    print(f"{timestampStr} Start polling each {(loop_sleep_seconds / 60)} minute {(start_polling_threshold_in_seconds / 60):.0f} minutes before next planting")
     print("************************")
 
     if secondsUntilPlanting > start_polling_threshold_in_seconds:
