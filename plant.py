@@ -70,13 +70,11 @@ while True:
     sleep = loop_sleep_seconds
     
     print("********** STATS *******")
-    print(f"{timestampStr} Seeds per day: {seedsPerDay:.3f}")
     print(f"{timestampStr} Planted plants: {plantedPlants:.3f}")
-    print(f"{timestampStr} Available seeds: {available:.3f}")
     print(f"{timestampStr} Available plants: {availablePlants:.3f}")
     print(f"{timestampStr} Margin of error: {margin_of_error:.3f}")
+    print(f"{timestampStr} Minimum plants to plant: {min_plant_amount:.3f}")
     print(f"{timestampStr} Plants needed before planting: {plantsNeededForPlanting:.3f}")
-    print(f"{timestampStr} Seeds needed before planting: {seedsNeededForPlanting:.3f}")
     print(f"{timestampStr} Until next planting: {buildTimer(secondsUntilPlanting)}")
     print(f"{timestampStr} Start polling each {(loop_sleep_seconds / 60)} minute {(start_polling_threshold_in_seconds / 60):.0f} minutes before next planting")
     print("************************")
