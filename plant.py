@@ -6,7 +6,6 @@ import time
 
 garden_contract_addr = "0x685BFDd3C2937744c13d7De0821c83191E3027FF"
 wallet_public_addr = "0x361472B5784e83fBF779b015f75ea0722741f304"
-# min_plant_amount = 2.00
 loop_sleep_seconds = 5
 margin_of_error = 0.005
 seeds_per_day_per_plant = 86400
