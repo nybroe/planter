@@ -6,7 +6,7 @@ import time
 
 garden_contract_addr = "0x685BFDd3C2937744c13d7De0821c83191E3027FF"
 wallet_public_addr = "0x361472B5784e83fBF779b015f75ea0722741f304"
-min_plant_amount = 2.00
+# min_plant_amount = 2.00
 loop_sleep_seconds = 5
 margin_of_error = 0.005
 seeds_per_day_per_plant = 86400
@@ -24,15 +24,20 @@ garden_contract = c.connect_to_contract(garden_contract_addr, garden_abi)
 
 # cycle class
 class cycleItem: 
-    def __init__(self, id, type): 
+    def __init__(self, id, type, minimumPlants): 
         self.id = id 
         self.type = type
+        self.minimumPlants = minimumPlants
 
 cycle = [] 
-cycle.append( cycleItem(1, "plant") )
-cycle.append( cycleItem(2, "plant") )
-cycle.append( cycleItem(3, "harvest") )
-nextCycleId = 2
+cycle.append( cycleItem(1, "plant", 1.00) )
+cycle.append( cycleItem(2, "plant", 1.00) )
+cycle.append( cycleItem(3, "plant", 1.00) )
+cycle.append( cycleItem(4, "plant", 1.00) )
+cycle.append( cycleItem(5, "plant", 1.00) )
+cycle.append( cycleItem(6, "harvest", 2.00) )
+cycle.append( cycleItem(7, "harvest", 2.00) )
+nextCycleId = 6
 
 # methods
 def seeds_for_1_plant():
@@ -72,9 +77,17 @@ def countdown(t):
         time.sleep(1)
         t -= 1
 
-def findCycleType(value):
+def findCycleMinimumPlants(cycleId):
     for x in cycle:
-        if x.id == value:
+        if x.id == cycleId:
+            return x.minimumPlants
+            break
+        else:
+            x = None
+
+def findCycleType(cycleId):
+    for x in cycle:
+        if x.id == cycleId:
             return x.type
             break
         else:
@@ -95,7 +108,9 @@ while True:
     plantedPlants = planted_plants()
     availablePlants = available / seedsFor1Plant
 
-    plantsNeededForPlanting = (min_plant_amount + margin_of_error) - availablePlants
+    cycleMinimumPlants = findCycleMinimumPlants(nextCycleId)
+
+    plantsNeededForPlanting = (cycleMinimumPlants + margin_of_error) - availablePlants
     seedsNeededForPlanting = plantsNeededForPlanting * seedsFor1Plant
     
     seedsPerDay = plantedPlants * seeds_per_day_per_plant
@@ -113,7 +128,7 @@ while True:
     print(f"{timestampStr} Planted plants: {plantedPlants:.3f}")
     print(f"{timestampStr} Available plants: {availablePlants:.3f}")
     print(f"{timestampStr} Margin of error: {margin_of_error:.3f}")
-    print(f"{timestampStr} Minimum plants to plant: {min_plant_amount:.3f}")
+    print(f"{timestampStr} Minimum plants to plant: {cycleMinimumPlants:.3f}")
     print(f"{timestampStr} Plants needed before planting: {plantsNeededForPlanting:.3f}")
     print(f"{timestampStr} Until next planting: {buildTimer(secondsUntilPlanting)}")
     print(f"{timestampStr} Next planting at: {getNextPlantingDate(secondsUntilPlanting)}")
@@ -123,7 +138,7 @@ while True:
     if secondsUntilPlanting > start_polling_threshold_in_seconds:
         sleep = secondsUntilPlanting - start_polling_threshold_in_seconds
             
-    if availablePlants >= min_plant_amount and availablePlants < (min_plant_amount + margin_of_error):
+    if availablePlants >= cycleMinimumPlants and availablePlants < (cycleMinimumPlants + margin_of_error):
         if nextCycleType == "plant":
             plant()
         if nextCycleType == "harvest":
