@@ -6,7 +6,7 @@ import time
 
 garden_contract_addr = "0x685BFDd3C2937744c13d7De0821c83191E3027FF"
 wallet_public_addr = "0x361472B5784e83fBF779b015f75ea0722741f304"
-min_plant_amount = 1.00
+min_plant_amount = 2.00
 loop_sleep_seconds = 5
 margin_of_error = 0.005
 seeds_per_day_per_plant = 86400
@@ -22,6 +22,19 @@ garden_abi = json.load(f)
 # create contract
 garden_contract = c.connect_to_contract(garden_contract_addr, garden_abi)
 
+# cycle class
+class cycleItem: 
+    def __init__(self, id, type): 
+        self.id = id 
+        self.type = type
+
+cycle = [] 
+cycle.append( cycleItem(1, "plant") )
+cycle.append( cycleItem(2, "plant") )
+cycle.append( cycleItem(3, "harvest") )
+nextCycleId = 2
+
+# methods
 def seeds_for_1_plant():
     seedsFor1Plant = garden_contract.functions.SEEDS_TO_GROW_1PLANT().call()
     return seedsFor1Plant
@@ -34,6 +47,10 @@ def planted_plants():
 
 def plant():
     txn = garden_contract.functions.plantSeeds(wallet_public_addr).buildTransaction(c.get_tx_options(wallet_public_addr, 500000))
+    return c.send_txn(txn, wallet_private_key)
+
+def harvest():
+    txn = garden_contract.functions.sellSeeds().buildTransaction(c.get_tx_options(wallet_public_addr, 500000))
     return c.send_txn(txn, wallet_private_key)
 
 def buildTimer(t):
@@ -55,8 +72,23 @@ def countdown(t):
         time.sleep(1)
         t -= 1
 
-    
+def findCycleType(value):
+    for x in cycle:
+        if x.id == value:
+            return x.type
+            break
+        else:
+            x = None
+
+def getNextCycleId(currentCycleId):
+    cycleLength = len(cycle)
+    if currentCycleId == cycleLength:
+        return 1
+    else:
+        return currentCycleId + 1
+
 # create infinate loop that checks contract every set sleep time
+nextCycleType = findCycleType(nextCycleId)
 while True:
     seedsFor1Plant = seeds_for_1_plant()
     available = available_seeds()
@@ -74,9 +106,10 @@ while True:
     dateTimeObj = datetime.now()
     timestampStr = dateTimeObj.strftime("[%d-%b-%Y (%H:%M:%S)]")
 
-    sleep = loop_sleep_seconds
+    sleep = loop_sleep_seconds 
     
     print("********** STATS *******")
+    print(f"{timestampStr} Next cycle type: {nextCycleType}")
     print(f"{timestampStr} Planted plants: {plantedPlants:.3f}")
     print(f"{timestampStr} Available plants: {availablePlants:.3f}")
     print(f"{timestampStr} Margin of error: {margin_of_error:.3f}")
@@ -84,16 +117,28 @@ while True:
     print(f"{timestampStr} Plants needed before planting: {plantsNeededForPlanting:.3f}")
     print(f"{timestampStr} Until next planting: {buildTimer(secondsUntilPlanting)}")
     print(f"{timestampStr} Next planting at: {getNextPlantingDate(secondsUntilPlanting)}")
-    print(f"{timestampStr} Start polling each {(loop_sleep_seconds / 60)} minute {(start_polling_threshold_in_seconds / 60):.0f} minutes before next planting")
+    print(f"{timestampStr} Start polling each {(loop_sleep_seconds / 60):.2f} minute {(start_polling_threshold_in_seconds / 60):.0f} minutes before next planting")
     print("************************")
 
     if secondsUntilPlanting > start_polling_threshold_in_seconds:
         sleep = secondsUntilPlanting - start_polling_threshold_in_seconds
             
     if availablePlants >= min_plant_amount and availablePlants < (min_plant_amount + margin_of_error):
-        plant()
+        if nextCycleType == "plant":
+            plant()
+        if nextCycleType == "harvest":
+            harvest()
+        
         print("********** PLANTED *******")
-        print(f"Added {availablePlants:.2f} plants to the garden!")
+        if nextCycleType == "plant":
+            print(f"{timestampStr} Added {availablePlants:.2f} plants to the garden!")
+        if nextCycleType == "harvest":
+            print(f"{timestampStr} Sold {availablePlants:.2f} plants!")
+
+        nextCycleId = getNextCycleId(nextCycleId)
+        nextCycleType = findCycleType(nextCycleId)
+        print(f"{timestampStr} Next cycleId is: {nextCycleId}")
+        print(f"{timestampStr} Next cycle type will be: {nextCycleType}")
         print("**************************")
 
     countdown(int(sleep))
