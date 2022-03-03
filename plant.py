@@ -3,13 +3,17 @@ import time
 import contract as c
 from datetime import datetime,timedelta
 import time
+import cloudscraper
+import json
 
 garden_contract_addr = "0x685BFDd3C2937744c13d7De0821c83191E3027FF"
+lp_contract_addr = "0xa0feB3c81A36E885B6608DF7f0ff69dB97491b58"
 wallet_public_addr = "0x361472B5784e83fBF779b015f75ea0722741f304"
-loop_sleep_seconds = 5
-margin_of_error = 0.05
+dextool_lp_url = "https://www.dextools.io/chain-bsc/api/pair/search?p=0xa0feb3c81a36e885b6608df7f0ff69db97491b58"
+loop_sleep_seconds = 0.5
+margin_of_error = 0.1
 seeds_per_day_per_plant = 86400
-start_polling_threshold_in_seconds = 60*2
+start_polling_threshold_in_seconds = 10
 
 # load private key
 wallet_private_key = open('key.txt', "r").readline()
@@ -18,8 +22,12 @@ wallet_private_key = open('key.txt', "r").readline()
 f = open('garden_abi.json')
 garden_abi = json.load(f)
 
+lp = open('drip_busd_abi.json')
+lp_abi = json.load(lp)
+
 # create contract
 garden_contract = c.connect_to_contract(garden_contract_addr, garden_abi)
+lp_contract = c.connect_to_contract(lp_contract_addr, lp_abi)
 
 # cycle class
 class cycleItem: 
@@ -30,16 +38,22 @@ class cycleItem:
 
 # cycle types are "plant" or "harvest"
 cycle = [] 
-cycle.append( cycleItem(1, "plant", 1.00) )
-cycle.append( cycleItem(2, "plant", 1.00) )
-cycle.append( cycleItem(3, "plant", 1.00) )
-cycle.append( cycleItem(4, "plant", 1.00) )
-cycle.append( cycleItem(5, "plant", 1.00) )
-cycle.append( cycleItem(6, "plant", 1.00) )
-cycle.append( cycleItem(7, "plant", 1.00) )
+cycle.append( cycleItem(1, "plant", 2.00) )
+cycle.append( cycleItem(2, "plant", 2.00) )
+cycle.append( cycleItem(3, "plant", 2.00) )
+cycle.append( cycleItem(4, "plant", 2.00) )
+cycle.append( cycleItem(5, "plant", 2.00) )
+cycle.append( cycleItem(6, "plant", 2.00) )
+cycle.append( cycleItem(7, "plant", 2.00) )
 nextCycleId = 7
 
 # methods
+def total_liquidity():
+    scraper = cloudscraper.create_scraper()
+    rr = scraper.get(dextool_lp_url).text 
+    yy = json.loads(rr)
+    return yy[0]['liquidity']
+
 def seeds_for_1_plant():
     seedsFor1Plant = garden_contract.functions.SEEDS_TO_GROW_1PLANT().call()
     return seedsFor1Plant
@@ -57,6 +71,10 @@ def plant():
 def harvest():
     txn = garden_contract.functions.sellSeeds().buildTransaction(c.get_tx_options(wallet_public_addr, 500000))
     return c.send_txn(txn, wallet_private_key)
+
+def total_supply():
+    total = lp_contract.functions.totalSupply().call()
+    return total//1000000000000000000
 
 def buildTimer(t):
     mins, secs = divmod(int(t), 60)
@@ -114,9 +132,19 @@ while True:
     seedsNeededForPlanting = plantsNeededForPlanting * seedsFor1Plant
     
     seedsPerDay = plantedPlants * seeds_per_day_per_plant
+    plantsPerDay = seedsPerDay/seedsFor1Plant
+    
     daysUntilPlanting = seedsNeededForPlanting / seedsPerDay
     hoursUntilPlanting = daysUntilPlanting * 24 
     secondsUntilPlanting = hoursUntilPlanting * 60 * 60
+
+    
+    
+
+    totalSupply = total_supply()
+    totalLiquidityValue = total_liquidity()
+    
+    lpValuePerDay = (float(totalLiquidityValue)/float(totalSupply))*0.12*plantsPerDay
 
     dateTimeObj = datetime.now()
     timestampStr = dateTimeObj.strftime("[%d-%b-%Y (%H:%M:%S)]")
@@ -125,6 +153,8 @@ while True:
     
     print("********** STATS *******")
     print(f"{timestampStr} Next cycle type: {nextCycleType}")
+    print(f"{timestampStr} LP daily value: {(lpValuePerDay):.3f}")
+    print(f"{timestampStr} Plants per day: {(seedsPerDay/seedsFor1Plant):.3f}")
     print(f"{timestampStr} Planted plants: {plantedPlants:.3f}")
     print(f"{timestampStr} Available plants: {availablePlants:.3f}")
     print(f"{timestampStr} Margin of error: {margin_of_error:.3f}")
@@ -132,7 +162,7 @@ while True:
     print(f"{timestampStr} Plants needed before planting: {plantsNeededForPlanting:.3f}")
     print(f"{timestampStr} Until next planting: {buildTimer(secondsUntilPlanting)}")
     print(f"{timestampStr} Next planting at: {getNextPlantingDate(secondsUntilPlanting)}")
-    print(f"{timestampStr} Start polling each {(loop_sleep_seconds / 60):.2f} minute {(start_polling_threshold_in_seconds / 60):.0f} minutes before next planting")
+    print(f"{timestampStr} Start polling each {(loop_sleep_seconds / 60):.2f} minute {(start_polling_threshold_in_seconds / 60):.3f} minutes before next planting")
     print("************************")
 
     if secondsUntilPlanting > start_polling_threshold_in_seconds:
