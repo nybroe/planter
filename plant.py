@@ -144,10 +144,11 @@ while True:
         if nextCycleType == "harvest":
             harvest()
         
-        print("********** PLANTED *******")
         if nextCycleType == "plant":
+            print("********** PLANTED *******")
             print(f"{timestampStr} Added {availablePlants:.2f} plants to the garden!")
         if nextCycleType == "harvest":
+            print("********** HARVESTED *****")
             print(f"{timestampStr} Sold {availablePlants:.2f} plants!")
 
         nextCycleId = getNextCycleId(nextCycleId)
