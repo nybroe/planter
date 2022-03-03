@@ -7,7 +7,7 @@ import time
 garden_contract_addr = "0x685BFDd3C2937744c13d7De0821c83191E3027FF"
 wallet_public_addr = "0x361472B5784e83fBF779b015f75ea0722741f304"
 loop_sleep_seconds = 5
-margin_of_error = 0.005
+margin_of_error = 0.05
 seeds_per_day_per_plant = 86400
 start_polling_threshold_in_seconds = 60*2
 
@@ -28,15 +28,16 @@ class cycleItem:
         self.type = type
         self.minimumPlants = minimumPlants
 
+# cycle types are "plant" or "harvest"
 cycle = [] 
 cycle.append( cycleItem(1, "plant", 1.00) )
 cycle.append( cycleItem(2, "plant", 1.00) )
 cycle.append( cycleItem(3, "plant", 1.00) )
 cycle.append( cycleItem(4, "plant", 1.00) )
 cycle.append( cycleItem(5, "plant", 1.00) )
-cycle.append( cycleItem(6, "harvest", 2.00) )
-cycle.append( cycleItem(7, "harvest", 2.00) )
-nextCycleId = 6
+cycle.append( cycleItem(6, "plant", 1.00) )
+cycle.append( cycleItem(7, "plant", 1.00) )
+nextCycleId = 7
 
 # methods
 def seeds_for_1_plant():
