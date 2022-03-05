@@ -190,12 +190,12 @@ def itterate(nextCycleId, nextCycleType):
 retryCount = 0
 while True:
     try: 
-        itterate(nextCycleId, nextCycleType) 
+        if retryCount < 5:
+            itterate(nextCycleId, nextCycleType)  
     except Exception as e:
         print("[EXCEPTION] Something went wrong! Message:")
         print(f"[EXCEPTION] {e}")
-    finally:
         retryCount = retryCount + 1
         if retryCount < 5:
             itterate(nextCycleId, nextCycleType)
-        print("[EXCEPTION] Retrying! (retryCount: {retryCount})")
+        print(f"[EXCEPTION] Retrying! (retryCount: {retryCount})")
