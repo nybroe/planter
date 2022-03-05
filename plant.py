@@ -38,13 +38,13 @@ class cycleItem:
 
 # cycle types are "plant" or "harvest"
 cycle = [] 
-cycle.append( cycleItem(1, "plant", 2.00) )
-cycle.append( cycleItem(2, "plant", 2.00) )
-cycle.append( cycleItem(3, "plant", 2.00) )
-cycle.append( cycleItem(4, "plant", 2.00) )
-cycle.append( cycleItem(5, "plant", 2.00) )
-cycle.append( cycleItem(6, "plant", 2.00) )
-cycle.append( cycleItem(7, "plant", 2.00) )
+cycle.append( cycleItem(1, "plant", 1.00) )
+cycle.append( cycleItem(2, "plant", 1.00) )
+cycle.append( cycleItem(3, "plant", 1.00) )
+cycle.append( cycleItem(4, "plant", 1.00) )
+cycle.append( cycleItem(5, "plant", 1.00) )
+cycle.append( cycleItem(6, "plant", 1.00) )
+cycle.append( cycleItem(7, "plant", 1.00) )
 nextCycleId = 7
 
 # methods
@@ -74,7 +74,7 @@ def harvest():
 
 def total_supply():
     total = lp_contract.functions.totalSupply().call()
-    return total//1000000000000000000
+    return total/1000000000000000000
 
 def buildTimer(t):
     mins, secs = divmod(int(t), 60)
@@ -120,7 +120,8 @@ def getNextCycleId(currentCycleId):
 
 # create infinate loop that checks contract every set sleep time
 nextCycleType = findCycleType(nextCycleId)
-while True:
+
+def itterate(nextCycleId, nextCycleType):
     seedsFor1Plant = seeds_for_1_plant()
     available = available_seeds()
     plantedPlants = planted_plants()
@@ -137,9 +138,6 @@ while True:
     daysUntilPlanting = seedsNeededForPlanting / seedsPerDay
     hoursUntilPlanting = daysUntilPlanting * 24 
     secondsUntilPlanting = hoursUntilPlanting * 60 * 60
-
-    
-    
 
     totalSupply = total_supply()
     totalLiquidityValue = total_liquidity()
@@ -168,7 +166,7 @@ while True:
     if secondsUntilPlanting > start_polling_threshold_in_seconds:
         sleep = secondsUntilPlanting - start_polling_threshold_in_seconds
             
-    if availablePlants >= cycleMinimumPlants and availablePlants < (cycleMinimumPlants + margin_of_error):
+    if availablePlants >= cycleMinimumPlants: # and availablePlants < (cycleMinimumPlants + margin_of_error):
         if nextCycleType == "plant":
             plant()
         if nextCycleType == "harvest":
@@ -188,4 +186,16 @@ while True:
         print("**************************")
 
     countdown(int(sleep))
-    
+
+retryCount = 0
+while True:
+    try: 
+        itterate(nextCycleId, nextCycleType) 
+    except Exception as e:
+        print("[EXCEPTION] Something went wrong! Message:")
+        print(f"[EXCEPTION] {e}")
+    finally:
+        retryCount = retryCount + 1
+        if retryCount < 5:
+            itterate(nextCycleId, nextCycleType)
+        print("[EXCEPTION] Retrying! (retryCount: {retryCount})")
