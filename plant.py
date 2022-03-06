@@ -141,8 +141,8 @@ def itterate(nextCycleId, nextCycleType):
 
     totalSupply = total_supply()
     totalLiquidityValue = total_liquidity()
-    
-    lpValuePerDay = (float(totalLiquidityValue)/float(totalSupply))*0.12*plantsPerDay
+
+    lpValuePerDay = (float(totalLiquidityValue)/float(totalSupply))*0.1*plantsPerDay
 
     dateTimeObj = datetime.now()
     timestampStr = dateTimeObj.strftime("[%d-%b-%Y (%H:%M:%S)]")
